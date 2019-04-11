@@ -11,7 +11,11 @@ Related site: http://cseweb.ucsd.edu/~gmporter/classes/sp19/cse223b/techreport/
 Guide:
 
 Client:
+
 Get: python client.py config_file get key
+
   example: python client.py config.txt get 3
+  
 Put: python client.py config_file put key value
+
   example: python client.py config.txt put 3 1
