@@ -6,7 +6,10 @@ import storage_service_pb2_grpc
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
 class StorageServer(helloworld_pb2_grpc.GreeterServicer):
+	self.storage = {}
+
 	def Get(self, request, context):
+		
 
 	def Put(self, request, context):
 
