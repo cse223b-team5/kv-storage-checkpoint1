@@ -9,7 +9,10 @@ class StorageServer(helloworld_pb2_grpc.GreeterServicer):
 	self.storage = {}
 
 	def Get(self, request, context):
-		
+  		if request.key in self.storage:
+  			return storage_service_pb2.GetResponse(value=self.storage[request.key], ret=1)
+  		else:
+  			return storage_service_pb2.GetResponse(value=self.storage[request.key], ret=0)
 
 	def Put(self, request, context):
 
