@@ -8,10 +8,13 @@ import storage_service_pb2_grpc
 from utils import load_config
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
-global configs
+
 
 class StorageServer(storage_service_pb2_grpc.KeyValueStoreServicer):
-    def __init__(self):
+    def __init__(self, config_path, myIp, myPort):
+        self.configs = load_config(config_path)
+        self.myIp = myIp
+        self.myPort = myPort
         self.storage = {}
 
     def Get(self, request, context):
@@ -25,18 +28,26 @@ class StorageServer(storage_service_pb2_grpc.KeyValueStoreServicer):
         self.broadcast_to_all_nodes(request)
         return storage_service_pb2.PutResponse(ret=1)
 
+    def Put_from_broadcast(self, request, context):
+        self.storage[request.key] = request.value
+        return storage_service_pb2.PutResponse(ret=1)
+
     def broadcast_to_all_nodes(self, request):
-        for ip, port in all_nodes:
-            with grpc.insecure_channel(ip+':'+port) as channel:
-                stub = storage_service_pb2_grpc.KeyValueStoreStub(channel)
-                stub.Put(request)
+        print('start broadcast to other nodes')
+        for ip, port in self.configs['nodes']:
+            if ip != self.myIp or port != self.myPort:
+                print('addr to connect: ' + ip + ":" + port)
+                with grpc.insecure_channel(ip+':'+port) as channel:
+                    stub = storage_service_pb2_grpc.KeyValueStoreStub(channel)
+                    # response = stub.Put(request)
+                    response = stub.Put_from_broadcast(storage_service_pb2.PutRequest(key=request.key, value=request.value))
+                    print('response from port' + str(port) + ":" + str(response.ret))
 
 
-def serve():
-    configs = load_config()
+def serve(config_path, myIp, myPort):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    storage_service_pb2_grpc.add_KeyValueStoreServicer_to_server(StorageServer(), server)
-    server.add_insecure_port(ip+':'+port)
+    storage_service_pb2_grpc.add_KeyValueStoreServicer_to_server(StorageServer(config_path, myIp, myPort), server)
+    server.add_insecure_port(myIp+':'+myPort)
     server.start()
     try:
         while True:
@@ -47,7 +58,7 @@ def serve():
 
 if __name__ == '__main__':
     logging.basicConfig()
-    config = sys.argv[1]
-    ip = sys.argv[2]
-    port = sys.argv[3]
-    serve()
+    config_path = sys.argv[1]
+    myIp = sys.argv[2]
+    myPort = sys.argv[3]
+    serve(config_path, myIp, myPort)
