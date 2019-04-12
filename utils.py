@@ -1,3 +1,4 @@
+
 def load_config(config_path):
     configs = {}
     with open(config_path) as f:
