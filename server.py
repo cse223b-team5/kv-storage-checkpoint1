@@ -36,7 +36,12 @@ class StorageServer(storage_service_pb2_grpc.KeyValueStoreServicer):
 
     def Put_from_broadcast(self, request, context):
         print('node #' + str(self.node_index) + ' receives rpc call from node #' + request.from_node)
-        threshold = conn_mat[request.from_node][self.node_index]
+
+        # read threshold from conn_mat
+        i = request.from_node
+        j = self.node_index
+        threshold = float(self.conn_mat.rows[i].vals[j])
+
         if random.random() > threshold:
             time_to_sleep = random.randint(5, 10) / 10  # sleep for random duration between 0.5-1 sec
             time.sleep(time_to_sleep)
