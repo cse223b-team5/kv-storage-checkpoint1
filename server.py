@@ -1,6 +1,7 @@
 from concurrent import futures
 import time
 import sys
+from utils import load
 import logging
 import grpc
 import storage_service_pb2
