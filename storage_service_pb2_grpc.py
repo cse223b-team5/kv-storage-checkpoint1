@@ -26,7 +26,7 @@ class KeyValueStoreStub(object):
         )
     self.Put_from_broadcast = channel.unary_unary(
         '/kvstore.KeyValueStore/Put_from_broadcast',
-        request_serializer=storage__service__pb2.PutRequest.SerializeToString,
+        request_serializer=storage__service__pb2.PutRequestToOtherServer.SerializeToString,
         response_deserializer=storage__service__pb2.PutResponse.FromString,
         )
 
@@ -71,7 +71,7 @@ def add_KeyValueStoreServicer_to_server(servicer, server):
       ),
       'Put_from_broadcast': grpc.unary_unary_rpc_method_handler(
           servicer.Put_from_broadcast,
-          request_deserializer=storage__service__pb2.PutRequest.FromString,
+          request_deserializer=storage__service__pb2.PutRequestToOtherServer.FromString,
           response_serializer=storage__service__pb2.PutResponse.SerializeToString,
       ),
   }

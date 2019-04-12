@@ -2,6 +2,7 @@ from concurrent import futures
 import time
 import sys
 import logging
+import random
 import grpc
 import storage_service_pb2
 import storage_service_pb2_grpc
@@ -17,6 +18,11 @@ class StorageServer(storage_service_pb2_grpc.KeyValueStoreServicer):
         self.myPort = myPort
         self.storage = {}
 
+        self.node_index = 0
+        for t in self.configs['nodes']:
+            if t[0] == myIp and t[1] == myPort:
+                self.node_index += 1
+
     def Get(self, request, context):
         if request.key in self.storage:
             return storage_service_pb2.GetResponse(value=str(self.storage[request.key]), ret=1)
@@ -29,8 +35,14 @@ class StorageServer(storage_service_pb2_grpc.KeyValueStoreServicer):
         return storage_service_pb2.PutResponse(ret=1)
 
     def Put_from_broadcast(self, request, context):
-        self.storage[request.key] = request.value
-        return storage_service_pb2.PutResponse(ret=1)
+        print('node #' + str(self.node_index) + ' receives rpc call from node #' + request.from_node)
+        threshold = conn_mat[request.from_node][self.node_index]
+        if random.random() > threshold:
+            time_to_sleep = random.randint(5, 10) / 10  # sleep for random duration between 0.5-1 sec
+            time.sleep(time_to_sleep)
+        else:
+            self.storage[request.key] = request.value
+            return storage_service_pb2.PutResponse(ret=1)
 
     def broadcast_to_all_nodes(self, request):
         print('start broadcast to other nodes')
@@ -39,8 +51,8 @@ class StorageServer(storage_service_pb2_grpc.KeyValueStoreServicer):
                 print('addr to connect: ' + ip + ":" + port)
                 with grpc.insecure_channel(ip+':'+port) as channel:
                     stub = storage_service_pb2_grpc.KeyValueStoreStub(channel)
-                    # response = stub.Put(request)
-                    response = stub.Put_from_broadcast(storage_service_pb2.PutRequest(key=request.key, value=request.value))
+                    response = stub.Put_from_broadcast(storage_service_pb2.PutRequestToOtherServer(
+                        key=request.key, value=request.value, from_node=str(self.node_index)))
                     print('response from port' + str(port) + ":" + str(response.ret))
 
 
