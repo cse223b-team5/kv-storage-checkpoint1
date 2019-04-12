@@ -1,6 +1,3 @@
 .idea/*
-<<<<<<< HEAD
-__pycharm__
+__pycache__
 .gitignore
-=======
->>>>>>> 7a74d3d073dbdc321c246dc7a7541475f7c45afa
