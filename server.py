@@ -6,6 +6,8 @@ import random
 import grpc
 import storage_service_pb2
 import storage_service_pb2_grpc
+import chaosmonkey_pb2
+import chaosmonkey_pb2_grpc
 from utils import load_config
 from chaos_server import ChaosServer
 
@@ -46,6 +48,7 @@ class StorageServer(storage_service_pb2_grpc.KeyValueStoreServicer):
         if random.random() > threshold:
             time_to_sleep = random.randint(5, 10) / 10  # sleep for random duration between 0.5-1 sec
             time.sleep(time_to_sleep)
+            print('broadcast from node #' + str(request.from_node) + 'to node #' + str(self.node_index) + ' was ignored')
         else:
             self.storage[request.key] = request.value
             return storage_service_pb2.PutResponse(ret=1)
@@ -60,6 +63,19 @@ class StorageServer(storage_service_pb2_grpc.KeyValueStoreServicer):
                     response = stub.Put_from_broadcast(storage_service_pb2.PutRequestToOtherServer(
                         key=request.key, value=request.value, from_node=str(self.node_index)))
                     print('response from port' + str(port) + ":" + str(response.ret))
+
+
+class ChaosServer(chaosmonkey_pb2_grpc.ChaosMonkeyServicer):
+    def UploadMatrix(self, request, context):
+        self.conn_mat = request
+        return chaosmonkey_pb2.Status(ret=0)
+
+    def UpdateValue(self, request, context):
+        if request.row >= len(self.conn_mat.rows) or request.col >= len(self.conn_mat.rows[request.row].vals):
+            return chaosmonkey_pb2.Status(ret = 1)
+
+        self.conn_mat.rows[request.row].vals[request.col] = request.val
+        return chaosmonkey_pb2.Status(ret = 0)
 
 
 def serve(config_path, myIp, myPort):

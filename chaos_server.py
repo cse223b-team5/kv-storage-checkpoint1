@@ -6,6 +6,7 @@ import grpc
 import chaosmonkey_pb2
 import chaosmonkey_pb2_grpc
 
+
 class ChaosServer(chaosmonkey_pb2_grpc.ChaosMonkeyServicer):
     def UploadMatrix(self, request, context):
         self.conn_mat = request

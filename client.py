@@ -31,9 +31,12 @@ def put(key, value):
     ip, port = pickANodeRandomly()
     with grpc.insecure_channel(ip+':'+port) as channel:
         stub = storage_service_pb2_grpc.KeyValueStoreStub(channel)
-        response = stub.Put(storage_service_pb2.PutRequest(key=key, value=value))
-        if response.ret == 1:
-            print('Success!')
+        try:
+            response = stub.Put(storage_service_pb2.PutRequest(key=key, value=value))
+            if response.ret == 1:
+                print('Success!')
+        except Exception as e:
+            print('RPC call failed!\n' + str(e))
 
 
 if __name__ == '__main__':

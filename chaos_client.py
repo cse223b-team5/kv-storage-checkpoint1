@@ -4,6 +4,8 @@ import grpc
 import random
 import storage_service_pb2
 import storage_service_pb2_grpc
+import chaosmonkey_pb2
+import chaosmonkey_pb2_grpc
 from utils import load_config
 from utils import load_matrix
 
@@ -70,19 +72,17 @@ def editMatrix(config_path, row, col, val):
             print('response from port' + str(port) + ":" + str(response.ret))
 
 
-def start(operation, config_path, matrix_path):
-    if operation == 'upload':
-        upload_matrix(config_path, matrix_path)
-    elif operation == 'edit':
-        edit_matrix(config_path, matrix)
-    else:
-        print("invalid operation")
-        exit(1)
-
-
 if __name__ == '__main__':
     logging.basicConfig()
     operation = sys.argv[1]
     config_path = sys.argv[2]
-    matrix_path = sys.argv[3]
-    start(operation, config_path, matrix_path)
+    if operation == 'upload':
+        matrix_path = sys.argv[3]
+        uploadMatrix(config_path, matrix_path)
+    elif operation == 'edit':
+        row = sys.argv[3]
+        col = sys.argv[4]
+        val = sys.argv[5]
+        editMatrix(config_path, row, col, val)
+    else:
+        print('Invalid opeartion')
