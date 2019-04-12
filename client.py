@@ -4,11 +4,15 @@ import grpc
 import random
 import storage_service_pb2
 import storage_service_pb2_grpc
+from utils import load_config
+
+global configs
 
 
 def pickANodeRandomly():
     n = len(configs['nodes'])
-    index = random.randint(n)
+    index = random.randint(0, n-1)
+    print('response from server #:' + str(index))
     return configs['nodes'][index]
 
 
@@ -34,14 +38,15 @@ def put(key, value):
 
 if __name__ == '__main__':
     logging.basicConfig()
-    config = sys.argv[1]
+    config_path = sys.argv[1]
+    configs = load_config(config_path)
     operation = sys.argv[2]
     if operation == 'get':
         key = sys.argv[3]
-        get(config, key)
+        get(key)
     elif operation == 'put':
         key = sys.argv[3]
         value = sys.argv[4]
-        put(config, key, value)
+        put(key, value)
     else:
         print("Invalid operation")

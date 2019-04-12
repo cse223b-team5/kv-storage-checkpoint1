@@ -24,6 +24,11 @@ class KeyValueStoreStub(object):
         request_serializer=storage__service__pb2.PutRequest.SerializeToString,
         response_deserializer=storage__service__pb2.PutResponse.FromString,
         )
+    self.Put_from_broadcast = channel.unary_unary(
+        '/kvstore.KeyValueStore/Put_from_broadcast',
+        request_serializer=storage__service__pb2.PutRequest.SerializeToString,
+        response_deserializer=storage__service__pb2.PutResponse.FromString,
+        )
 
 
 class KeyValueStoreServicer(object):
@@ -44,6 +49,13 @@ class KeyValueStoreServicer(object):
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
+  def Put_from_broadcast(self, request, context):
+    # missing associated documentation comment in .proto file
+    pass
+    context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+    context.set_details('Method not implemented!')
+    raise NotImplementedError('Method not implemented!')
+
 
 def add_KeyValueStoreServicer_to_server(servicer, server):
   rpc_method_handlers = {
@@ -54,6 +66,11 @@ def add_KeyValueStoreServicer_to_server(servicer, server):
       ),
       'Put': grpc.unary_unary_rpc_method_handler(
           servicer.Put,
+          request_deserializer=storage__service__pb2.PutRequest.FromString,
+          response_serializer=storage__service__pb2.PutResponse.SerializeToString,
+      ),
+      'Put_from_broadcast': grpc.unary_unary_rpc_method_handler(
+          servicer.Put_from_broadcast,
           request_deserializer=storage__service__pb2.PutRequest.FromString,
           response_serializer=storage__service__pb2.PutResponse.SerializeToString,
       ),
