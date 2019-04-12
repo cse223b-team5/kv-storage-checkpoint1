@@ -45,6 +45,7 @@ class StorageServer(storage_service_pb2_grpc.KeyValueStoreServicer):
         if random.random() > threshold:
             time_to_sleep = random.randint(5, 10) / 10  # sleep for random duration between 0.5-1 sec
             time.sleep(time_to_sleep)
+            print('broadcast from node #' + str(request.from_node) + 'to node #' + self.node_index + ' was ignored')
         else:
             self.storage[request.key] = request.value
             return storage_service_pb2.PutResponse(ret=1)
