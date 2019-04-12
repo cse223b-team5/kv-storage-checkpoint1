@@ -5,7 +5,7 @@ package kvstore;
 service KeyValueStore {
     rpc Get(GetRequest) returns (GetResponse) {}
     rpc Put(PutRequest) returns (PutResponse) {}
-    rpc Put_from_broadcast(PutRequest) returns (PutResponse) {}
+    rpc Put_from_broadcast(PutRequestToOtherServer) returns (PutResponse) {}
 }
 
 // You'll likely need to define more specific return codes than these!
@@ -30,4 +30,10 @@ message PutRequest {
 
 message PutResponse {
     ReturnCode ret = 1;
+}
+
+message PutRequestToOtherServer {
+    string key = 1;
+    string value = 2;
+    string from_node = 3;
 }

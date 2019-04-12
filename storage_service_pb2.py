@@ -20,7 +20,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='kvstore',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\x15storage_service.proto\x12\x07kvstore\"\x19\n\nGetRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\">\n\x0bGetResponse\x12\r\n\x05value\x18\x01 \x01(\t\x12 \n\x03ret\x18\x02 \x01(\x0e\x32\x13.kvstore.ReturnCode\"(\n\nPutRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\"/\n\x0bPutResponse\x12 \n\x03ret\x18\x01 \x01(\x0e\x32\x13.kvstore.ReturnCode*&\n\nReturnCode\x12\x0b\n\x07SUCCESS\x10\x00\x12\x0b\n\x07\x46\x41ILURE\x10\x01\x32\xba\x01\n\rKeyValueStore\x12\x32\n\x03Get\x12\x13.kvstore.GetRequest\x1a\x14.kvstore.GetResponse\"\x00\x12\x32\n\x03Put\x12\x13.kvstore.PutRequest\x1a\x14.kvstore.PutResponse\"\x00\x12\x41\n\x12Put_from_broadcast\x12\x13.kvstore.PutRequest\x1a\x14.kvstore.PutResponse\"\x00\x62\x06proto3')
+  serialized_pb=_b('\n\x15storage_service.proto\x12\x07kvstore\"\x19\n\nGetRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\">\n\x0bGetResponse\x12\r\n\x05value\x18\x01 \x01(\t\x12 \n\x03ret\x18\x02 \x01(\x0e\x32\x13.kvstore.ReturnCode\"(\n\nPutRequest\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\"/\n\x0bPutResponse\x12 \n\x03ret\x18\x01 \x01(\x0e\x32\x13.kvstore.ReturnCode\"H\n\x17PutRequestToOtherServer\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t\x12\x11\n\tfrom_node\x18\x03 \x01(\t*&\n\nReturnCode\x12\x0b\n\x07SUCCESS\x10\x00\x12\x0b\n\x07\x46\x41ILURE\x10\x01\x32\xc7\x01\n\rKeyValueStore\x12\x32\n\x03Get\x12\x13.kvstore.GetRequest\x1a\x14.kvstore.GetResponse\"\x00\x12\x32\n\x03Put\x12\x13.kvstore.PutRequest\x1a\x14.kvstore.PutResponse\"\x00\x12N\n\x12Put_from_broadcast\x12 .kvstore.PutRequestToOtherServer\x1a\x14.kvstore.PutResponse\"\x00\x62\x06proto3')
 )
 
 _RETURNCODE = _descriptor.EnumDescriptor(
@@ -40,8 +40,8 @@ _RETURNCODE = _descriptor.EnumDescriptor(
   ],
   containing_type=None,
   serialized_options=None,
-  serialized_start=216,
-  serialized_end=254,
+  serialized_start=290,
+  serialized_end=328,
 )
 _sym_db.RegisterEnumDescriptor(_RETURNCODE)
 
@@ -188,12 +188,58 @@ _PUTRESPONSE = _descriptor.Descriptor(
   serialized_end=214,
 )
 
+
+_PUTREQUESTTOOTHERSERVER = _descriptor.Descriptor(
+  name='PutRequestToOtherServer',
+  full_name='kvstore.PutRequestToOtherServer',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='key', full_name='kvstore.PutRequestToOtherServer.key', index=0,
+      number=1, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='value', full_name='kvstore.PutRequestToOtherServer.value', index=1,
+      number=2, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+    _descriptor.FieldDescriptor(
+      name='from_node', full_name='kvstore.PutRequestToOtherServer.from_node', index=2,
+      number=3, type=9, cpp_type=9, label=1,
+      has_default_value=False, default_value=_b("").decode('utf-8'),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=216,
+  serialized_end=288,
+)
+
 _GETRESPONSE.fields_by_name['ret'].enum_type = _RETURNCODE
 _PUTRESPONSE.fields_by_name['ret'].enum_type = _RETURNCODE
 DESCRIPTOR.message_types_by_name['GetRequest'] = _GETREQUEST
 DESCRIPTOR.message_types_by_name['GetResponse'] = _GETRESPONSE
 DESCRIPTOR.message_types_by_name['PutRequest'] = _PUTREQUEST
 DESCRIPTOR.message_types_by_name['PutResponse'] = _PUTRESPONSE
+DESCRIPTOR.message_types_by_name['PutRequestToOtherServer'] = _PUTREQUESTTOOTHERSERVER
 DESCRIPTOR.enum_types_by_name['ReturnCode'] = _RETURNCODE
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -225,6 +271,13 @@ PutResponse = _reflection.GeneratedProtocolMessageType('PutResponse', (_message.
   ))
 _sym_db.RegisterMessage(PutResponse)
 
+PutRequestToOtherServer = _reflection.GeneratedProtocolMessageType('PutRequestToOtherServer', (_message.Message,), dict(
+  DESCRIPTOR = _PUTREQUESTTOOTHERSERVER,
+  __module__ = 'storage_service_pb2'
+  # @@protoc_insertion_point(class_scope:kvstore.PutRequestToOtherServer)
+  ))
+_sym_db.RegisterMessage(PutRequestToOtherServer)
+
 
 
 _KEYVALUESTORE = _descriptor.ServiceDescriptor(
@@ -233,8 +286,8 @@ _KEYVALUESTORE = _descriptor.ServiceDescriptor(
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=257,
-  serialized_end=443,
+  serialized_start=331,
+  serialized_end=530,
   methods=[
   _descriptor.MethodDescriptor(
     name='Get',
@@ -259,7 +312,7 @@ _KEYVALUESTORE = _descriptor.ServiceDescriptor(
     full_name='kvstore.KeyValueStore.Put_from_broadcast',
     index=2,
     containing_service=None,
-    input_type=_PUTREQUEST,
+    input_type=_PUTREQUESTTOOTHERSERVER,
     output_type=_PUTRESPONSE,
     serialized_options=None,
   ),
