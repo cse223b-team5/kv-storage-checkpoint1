@@ -4,9 +4,10 @@ import logging
 import grpc
 import storage_service_pb2
 import storage_service_pb2_grpc
+from utils import load_config
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
-
+global configs
 
 class StorageServer(storage_service_pb2_grpc.KeyValueStoreServicer):
     def __init__(self):
@@ -24,6 +25,7 @@ class StorageServer(storage_service_pb2_grpc.KeyValueStoreServicer):
 
 
 def serve():
+    configs = load_config()
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     storage_service_pb2_grpc.add_KeyValueStoreServicer_to_server(StorageServer(), server)
     server.add_insecure_port('[::]:50051')
