@@ -1,13 +1,15 @@
 import logging
 import sys
 import grpc
+import random
 import storage_service_pb2
 import storage_service_pb2_grpc
 
 
 def pickANodeRandomly():
-
-    return ip, port
+    n = len(configs['nodes'])
+    index = random.randint(n)
+    return configs['nodes'][index]
 
 
 def get(key):

@@ -10,7 +10,9 @@ _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
 
 class StorageServer(storage_service_pb2_grpc.KeyValueStoreServicer):
-    def __init__(self):
+    def __init__(self, myIp, myPort):
+        self.myIp = myIp
+        self.myPort = myPort
         self.storage = {}
 
     def Get(self, request, context):
@@ -25,16 +27,17 @@ class StorageServer(storage_service_pb2_grpc.KeyValueStoreServicer):
         return storage_service_pb2.PutResponse(ret=1)
 
     def broadcast_to_all_nodes(self, request):
-        for ip, port in all_nodes:
-            with grpc.insecure_channel(ip+':'+port) as channel:
-                stub = storage_service_pb2_grpc.KeyValueStoreStub(channel)
-                stub.Put(request)
+        for ip, port in configs['nodes']:
+            if ip != self.myIp and port != self.myPort:
+                with grpc.insecure_channel(ip+':'+port) as channel:
+                    stub = storage_service_pb2_grpc.KeyValueStoreStub(channel)
+                    stub.Put(request)
 
 
 def serve():
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    storage_service_pb2_grpc.add_KeyValueStoreServicer_to_server(StorageServer(), server)
-    server.add_insecure_port(ip+':'+port)
+    storage_service_pb2_grpc.add_KeyValueStoreServicer_to_server(StorageServer(myIp, myPort), server)
+    server.add_insecure_port(myIp+':'+myPort)
     server.start()
     try:
         while True:
@@ -46,6 +49,6 @@ def serve():
 if __name__ == '__main__':
     logging.basicConfig()
     config = sys.argv[1]
-    ip = sys.argv[2]
-    port = sys.argv[3]
+    myIp = sys.argv[2]
+    myPort = sys.argv[3]
     serve()
