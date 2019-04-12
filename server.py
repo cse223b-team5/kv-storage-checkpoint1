@@ -6,6 +6,7 @@ import grpc
 import storage_service_pb2
 import storage_service_pb2_grpc
 from utils import load_config
+from chaos_server import ChaosServer
 
 _ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
@@ -47,6 +48,8 @@ class StorageServer(storage_service_pb2_grpc.KeyValueStoreServicer):
 def serve(config_path, myIp, myPort):
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     storage_service_pb2_grpc.add_KeyValueStoreServicer_to_server(StorageServer(config_path, myIp, myPort), server)
+    chaosmonkey_pb2_grpc.add_ChaosMonkeyServicer_to_server(ChaosServer(), server)
+
     server.add_insecure_port(myIp+':'+myPort)
     server.start()
     try:
