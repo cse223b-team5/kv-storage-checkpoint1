@@ -5,8 +5,14 @@ import storage_service_pb2
 import storage_service_pb2_grpc
 
 
-def get(config, key):
-    with grpc.insecure_channel('localhost:50051') as channel:
+def pickANodeRandomly():
+
+    return ip, port
+
+
+def get(key):
+    ip, port = pickANodeRandomly()
+    with grpc.insecure_channel(ip+':'+port) as channel:
         stub = storage_service_pb2_grpc.KeyValueStoreStub(channel)
         response = stub.Get(storage_service_pb2.GetRequest(key=key))
         if response.ret == 1:
@@ -15,8 +21,9 @@ def get(config, key):
             print('Failed!')
 
 
-def put(config, key, value):
-    with grpc.insecure_channel('localhost:50051') as channel:
+def put(key, value):
+    ip, port = pickANodeRandomly()
+    with grpc.insecure_channel(ip+':'+port) as channel:
         stub = storage_service_pb2_grpc.KeyValueStoreStub(channel)
         response = stub.Put(storage_service_pb2.PutRequest(key=key, value=value))
         if response.ret == 1:
