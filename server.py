@@ -24,7 +24,8 @@ class StorageServer(storage_service_pb2_grpc.KeyValueStoreServicer):
         self.node_index = 0
         for t in self.configs['nodes']:
             if t[0] == myIp and t[1] == myPort:
-                self.node_index += 1
+                break
+            self.node_index += 1
 
     def Get(self, request, context):
         if request.key in self.storage:
@@ -33,6 +34,12 @@ class StorageServer(storage_service_pb2_grpc.KeyValueStoreServicer):
             return storage_service_pb2.GetResponse(ret=0)
 
     def Put(self, request, context):
+        global conn_mat
+        try:
+            conn_mat
+            print('ConnMax exists')
+        except:
+            print('ConnMax does not exist')
         self.storage[request.key] = request.value
         self.broadcast_to_all_nodes(request)
         return storage_service_pb2.PutResponse(ret=1)
@@ -40,15 +47,24 @@ class StorageServer(storage_service_pb2_grpc.KeyValueStoreServicer):
     def Put_from_broadcast(self, request, context):
         print('node #' + str(self.node_index) + ' receives rpc call from node #' + request.from_node)
 
+        global conn_mat
+        try:
+            conn_mat
+        except Exception as e:
+            print('ConnMat hasn\'t been uploaded. No msg is ignored')
+            self.storage[request.key] = request.value
+            return storage_service_pb2.PutResponse(ret=1)
+
         # read threshold from conn_mat
-        i = request.from_node
-        j = self.node_index
-        threshold = float(self.conn_mat.rows[i].vals[j])
+        i = int(request.from_node)
+        j = int(self.node_index)
+        threshold = float(conn_mat.rows[i].vals[j])
 
         if random.random() > threshold:
             time_to_sleep = random.randint(5, 10) / 10  # sleep for random duration between 0.5-1 sec
             time.sleep(time_to_sleep)
             print('broadcast from node #' + str(request.from_node) + 'to node #' + str(self.node_index) + ' was ignored')
+            return storage_service_pb2.PutResponse(ret=0)
         else:
             self.storage[request.key] = request.value
             return storage_service_pb2.PutResponse(ret=1)
@@ -60,22 +76,26 @@ class StorageServer(storage_service_pb2_grpc.KeyValueStoreServicer):
                 print('addr to connect: ' + ip + ":" + port)
                 with grpc.insecure_channel(ip+':'+port) as channel:
                     stub = storage_service_pb2_grpc.KeyValueStoreStub(channel)
-                    response = stub.Put_from_broadcast(storage_service_pb2.PutRequestToOtherServer(
+                    try:
+                        response = stub.Put_from_broadcast(storage_service_pb2.PutRequestToOtherServer(
                         key=request.key, value=request.value, from_node=str(self.node_index)))
-                    print('response from port' + str(port) + ":" + str(response.ret))
+                        print('response from port' + str(port) + ":" + str(response.ret))
+                    except Exception as e:
+                        print('RPC call failed! (broadcast)')
 
 
 class ChaosServer(chaosmonkey_pb2_grpc.ChaosMonkeyServicer):
     def UploadMatrix(self, request, context):
-        self.conn_mat = request
+        global conn_mat
+        conn_mat = request
         return chaosmonkey_pb2.Status(ret=0)
 
     def UpdateValue(self, request, context):
-        if request.row >= len(self.conn_mat.rows) or request.col >= len(self.conn_mat.rows[request.row].vals):
-            return chaosmonkey_pb2.Status(ret = 1)
-
-        self.conn_mat.rows[request.row].vals[request.col] = request.val
-        return chaosmonkey_pb2.Status(ret = 0)
+        global conn_mat
+        if request.row >= len(conn_mat.rows) or request.col >= len(conn_mat.rows[request.row].vals):
+            return chaosmonkey_pb2.Status(ret=1)
+        conn_mat.rows[request.row].vals[request.col] = request.val
+        return chaosmonkey_pb2.Status(ret=0)
 
 
 def serve(config_path, myIp, myPort):
