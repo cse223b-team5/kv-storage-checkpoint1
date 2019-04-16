@@ -1,6 +1,6 @@
 N: 5
-node0: localhost:5001
-node1: localhost:5002
-node2: localhost:5003
-node3: localhost:5004
-node4: localhost:5005
+node0: 35.164.96.70:5001
+node1: 35.164.96.70:5002
+node2: 35.164.96.70:5003
+node3: 35.164.96.70:5004
+node4: 35.164.96.70:5005
