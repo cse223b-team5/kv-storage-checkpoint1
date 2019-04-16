@@ -13,6 +13,7 @@ def load_config(config_path):
             line = f.readline()
     return configs
 
+
 def load_matrix(matrix_path):
     matrix_list = []
     with open(matrix_path) as f:

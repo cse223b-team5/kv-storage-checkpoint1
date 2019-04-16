@@ -42,12 +42,11 @@ def put(key, value):
 def _upload_to_server(configs, matrix):
     print('start uploading conn_matrix to other nodes')
     for ip, port in configs['nodes']:
-        print('addr to connect: ' + ip + ":" + port)
+        print('Addr to connect: ' + ip + ":" + port)
         with grpc.insecure_channel(ip + ':' + port) as channel:
             stub = chaosmonkey_pb2_grpc.ChaosMonkeyStub(channel)
-            # response = stub.Put(request)
             response = stub.UploadMatrix(matrix)
-            print('response from port' + str(port) + ":" + str(response.ret))
+            print('Response from port' + str(port) + ":" + str(response.ret))
 
 
 def uploadMatrix(config_path, matrix_path):
@@ -64,12 +63,11 @@ def uploadMatrix(config_path, matrix_path):
 def editMatrix(config_path, row, col, val):
     configs = load_config(config_path)
     for ip, port in configs['nodes']:
-        print('addr to connect: ' + ip + ":" + port)
+        print('Addr to connect: ' + ip + ":" + port)
         with grpc.insecure_channel(ip + ':' + port) as channel:
             stub = chaosmonkey_pb2_grpc.ChaosMonkeyStub(channel)
-            # response = stub.Put(request)
-            response = stub.UpdateValue(chaosmonkey_pb2.MatValue(row=row, col=col, val=val))
-            print('response from port' + str(port) + ":" + str(response.ret))
+            response = stub.UpdateValue(chaosmonkey_pb2.MatValue(row=int(row), col=int(col), val=float(val)))
+            print('Response from port' + str(port) + ":" + str(response.ret))
 
 
 if __name__ == '__main__':
