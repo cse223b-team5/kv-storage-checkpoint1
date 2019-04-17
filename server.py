@@ -60,7 +60,7 @@ class StorageServer(storage_service_pb2_grpc.KeyValueStoreServicer):
         j = int(self.node_index)
         threshold = float(conn_mat.rows[i].vals[j])
 
-        if random.random() > threshold:
+        if random.random() < threshold:
             # drop this request
             time_to_sleep = random.randint(5, 10) / 10  # sleep for random duration between 0.5-1 sec
             time.sleep(time_to_sleep)
