@@ -83,6 +83,7 @@ class StorageServer(storage_service_pb2_grpc.KeyValueStoreServicer):
                         print('Response from port' + str(port) + ":" + str(response.ret))
                     except Exception as e:
                         print('RPC call failed! (broadcast)')
+                        print(e)
 
 
 class ChaosServer(chaosmonkey_pb2_grpc.ChaosMonkeyServicer):
