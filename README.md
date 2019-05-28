@@ -1,4 +1,4 @@
-# cse223b-project
+# cse223b-project-checkpoint1
 A fault-tolerant distributed k/v storage system based on RAFT
 
 Team member:
